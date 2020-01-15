@@ -17,12 +17,11 @@ jobs:
     members:
       - '张三'
       - '李四'
-    allow_less_member: false #允许余票<乘客时，提交订单
+    allow_less_member: false #允许余票 < 乘客时，提交订单
     seats:
       - '硬座'
       - '二等座'
     train_numbers:
-      - 'K1620'
       - 'K106'
       - 'Z182'
       - 'K134'
