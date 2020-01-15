@@ -1,0 +1,37 @@
+users:
+  - user_name: ''
+    user_password: ''
+    uuid: 'test'
+rail_device: ''  #需要12306网站cookie中的RAIL_RAIL_DEVICEID
+rail_expire: ''  #需要12306网站cookie中的RAIL_EXPIRATION
+login_heart_beat: 120 #定时去登录用户，防止cookie失效
+jobs:
+  - station:
+      left: '深圳'
+      arrive: '吉安'
+    name: 'job-test'
+    account: 'test'  #对应users的uuid
+    dates:
+      - '2020-01-22'
+      - '2020-01-21'
+    members:
+      - '张三'
+      - '李四'
+    allow_less_member: false #允许余票<乘客时，提交订单
+    seats:
+      - '硬座'
+      - '二等座'
+    train_numbers:
+      - 'K1620'
+      - 'K106'
+      - 'Z182'
+      - 'K134'
+      - 'K34'
+      - 'T212'
+      - 'Z332'
+      - 'K1656'
+    except_train_numbers:
+      - 'K1620'
+    query_interval: 3 #查询的间隔
+    queue_ticke_flag: true #是否抢候补
+
