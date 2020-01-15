@@ -8,7 +8,9 @@
 - [ ] 候补功能
 - [ ] 下单功能
 - [ ] 配置多样化
+- [ ] docker-compose 一键启动，无忧抢票
 - [ ] 多机器查询，分布式时钟同步，做到秒级车票查询，订阅channel下候补和订单
 - [ ] Uber Jager trace 分析接口请求响应时间
 - [ ] Prometheus 上报统计分析结果
 - [ ] CND的IP抢票概率分析
+- [ ] admin展示
