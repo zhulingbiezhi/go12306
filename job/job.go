@@ -157,7 +157,7 @@ func (job *UserJob) FilterResult(ctx context.Context, result *query.TicketResult
 		//logger.Info(result.TrainCode, "---", seat, "---", seatValue)
 		if seatValue == "无" {
 			if result.HoubuTrainFlag == "1" {
-				logger.Info("add to queue: ", result.TrainCode, "---", seat, "---", seatValue)
+				//logger.Info("add to queue: ", result.TrainCode, "---", seat, "---", seatValue)
 				queues = append(queues, order.BuildOrderQueue(ctx, result.Secret, seatKey, result.TrainCode))
 			}
 		} else if seatValue != "" && seatValue != "*" {
@@ -208,6 +208,7 @@ func (job *UserJob) TicketQueryJob(ctx context.Context, orderChan chan<- order.O
 	t := time.NewTimer(sec)
 	index := 0
 	for {
+		index++
 		select {
 		case <-t.C:
 			logger.Infof("query timer %d", index)
@@ -253,7 +254,7 @@ func (job *UserJob) LoginJob(ctx context.Context, loginChan <-chan struct{}, log
 		select {
 		case <-t.C:
 			if err := job.Login(ctx); err != nil {
-				logger.Error("job login err", err)
+				logger.Error("job login err:", err)
 				//5秒后重试登录
 				t.Reset(time.Second * 5)
 			} else {
@@ -262,7 +263,7 @@ func (job *UserJob) LoginJob(ctx context.Context, loginChan <-chan struct{}, log
 			}
 		case <-loginChan:
 			if err := job.Login(ctx); err != nil {
-				logger.Error("loginChan---job login err", err)
+				logger.Error("loginChan---job login err:", err)
 				loginSuccessChan <- false
 			} else {
 				logger.Info("loginChan---job login success")

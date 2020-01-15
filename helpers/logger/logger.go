@@ -145,7 +145,6 @@ func GoroutineShutdown() {
 }
 
 func init() {
-	loggerLevel = log.ErrorLevel
 	defaultLog = &log.Logger{
 		Out:       os.Stdout,
 		Formatter: &LogFormatter{},

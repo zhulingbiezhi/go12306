@@ -1,6 +1,7 @@
 package common
 
 import (
+	"go12306/utils"
 	"io/ioutil"
 	"strings"
 )
@@ -65,7 +66,7 @@ type StationInfo struct {
 var StationMap = make(map[string]*StationInfo)
 
 func init() {
-	b, err := ioutil.ReadFile("/Users/klook/work/golang/src/go12306/config/stations.txt")
+	b, err := ioutil.ReadFile(utils.GetCurDir() + "/config/stations.txt")
 	if err != nil {
 		panic(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/spf13/viper"
 	"go12306/helpers/logger"
+	"go12306/utils"
 )
 
 var Conf *config
@@ -26,8 +27,7 @@ func init() {
 
 func LoadConf() (*config, error) {
 	viper.SetConfigName("testing")
-	//viper.AddConfigPath("config")
-	viper.AddConfigPath("/Users/klook/work/golang/src/go12306/config")
+	viper.AddConfigPath(utils.GetCurDir() + "/config")
 	err := viper.ReadInConfig()
 	if err != nil {
 		return nil, err

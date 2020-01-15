@@ -56,7 +56,7 @@ func (q *OrderQueue) Submit(ctx context.Context) error {
 }
 
 func (q *OrderQueue) Check(ctx context.Context) error {
-	logger.Info("start queue check ",q.TrainNo)
+	logger.Info("start queue check ", q.TrainNo)
 	err := q.ChechFace(ctx)
 	if err != nil {
 		return errors.Errorf(err, "ChechFace err")
