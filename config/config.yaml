@@ -29,7 +29,7 @@ jobs:
       - 'T212'
       - 'Z332'
       - 'K1656'
-    except_train_numbers:
+    except_train_numbers:  #优先排除某些车次
       - 'K1620'
     query_interval: 3 #查询的间隔
     queue_ticke_flag: true #是否抢候补
