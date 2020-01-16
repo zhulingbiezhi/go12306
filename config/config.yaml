@@ -9,7 +9,7 @@ jobs:
   - station:
       left: '深圳'
       arrive: '吉安'
-    name: 'job-test'
+    name: 'job-test' #job的名称，不要重复
     account: 'test'  #对应users的uuid
     dates:
       - '2020-01-22'
