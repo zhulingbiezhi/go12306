@@ -7,9 +7,18 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/jinzhu/gorm"
 	"os"
 	"runtime"
+	"strings"
+)
+
+const (
+	nocolor = 0
+	red     = 31
+	green   = 32
+	yellow  = 33
+	blue    = 36
+	gray    = 37
 )
 
 const (
@@ -110,7 +119,10 @@ func (f *LogFormatter) Format(entry *log.Entry) ([]byte, error) {
 	fileStr := fmt.Sprintf("(%s) ", data[FieldKeyFileName])
 	timeStr := fmt.Sprintf("[%s] ", entry.Time.Format(timestampFormat))
 	reqIDStr := fmt.Sprintf("[%s] ", data[FieldKeyRequestID])
-	levelStr := fmt.Sprintf("[%s] ", entry.Level.String())
+	levelStr := fmt.Sprintf("[%s] ", strings.ToUpper(entry.Level.String())[:1])
+
+	c := GetLevelColor(entry.Level)
+	_, _ = fmt.Fprintf(buf, "\x1b[%dm", c)
 	buf.WriteString(fileStr)
 	buf.WriteString(reqIDStr)
 	buf.WriteString("\n")
@@ -120,11 +132,25 @@ func (f *LogFormatter) Format(entry *log.Entry) ([]byte, error) {
 	delete(data, FieldKeyFileName)
 	buf.WriteString(fmt.Sprintf("[ %s ]", entry.Message))
 	buf.WriteString("\n")
+	buf.WriteString("\x1b[0m")
 	if len(data) > 0 {
 		buf.WriteString(awsutil.Prettify(data))
 	}
 	buf.WriteString("\n")
 	return buf.Bytes(), nil
+}
+
+func GetLevelColor(level log.Level) int {
+	switch level {
+	case log.DebugLevel:
+		return gray
+	case log.WarnLevel:
+		return yellow
+	case log.ErrorLevel, log.FatalLevel, log.PanicLevel:
+		return red
+	default:
+		return blue
+	}
 }
 
 func GetLogger() *log.Entry {
@@ -151,16 +177,4 @@ func init() {
 		Hooks:     make(log.LevelHooks),
 		Level:     loggerLevel,
 	}
-}
-
-type GormLogger struct {
-	logInstance *log.Entry
-}
-
-func NewGormLogger() *GormLogger {
-	return &GormLogger{logInstance: GetLogger()}
-}
-
-func (g *GormLogger) Print(v ...interface{}) {
-	g.logInstance.WithFields(log.Fields{"module": "gorm", "type": "sql"}).Print(gorm.LogFormatter(v...)...)
 }
