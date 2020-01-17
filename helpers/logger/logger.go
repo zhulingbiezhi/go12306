@@ -31,7 +31,6 @@ const (
 )
 
 var loggerLevel = log.InfoLevel
-var LogManager = map[string]*log.Logger{}
 var defaultLog *log.Logger
 
 func getFileName() string {
