@@ -124,7 +124,7 @@ retry:
 	}))
 	b, err := rs.DoRest(http.MethodPost, conf.API_BASE_LOGIN_URL, v.Encode()).ParseJsonBody(&ret)
 	if err != nil {
-		return "", err
+		return "", errors.Errorf(err, "")
 	}
 	if ret.ResultCode != 0 {
 		return "", errors.Errorf(nil, "login fail: %+s", string(b))

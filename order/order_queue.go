@@ -103,7 +103,7 @@ func (q *OrderQueue) ChechFace(ctx context.Context) error {
 		return errors.Errorf(nil, "http code %d != 200, reason: %+v body : %+v", resp.HttpStatus, resp.Messages, string(body))
 	}
 	if !resp.Data.LoginFlag {
-		return errors.Errorf(nil, "user not login")
+		return errors.Errorf(errors.LoginErr, "user not login")
 	}
 	if !resp.Data.FaceFlag {
 		return errors.Errorf(nil, "response is not success")
