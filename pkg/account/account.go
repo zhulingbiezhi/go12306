@@ -1,4 +1,4 @@
-package user
+package account
 
 import (
 	"context"
@@ -22,12 +22,19 @@ const (
 	maxRetryTime = 5
 )
 
-type User struct {
-	Name         string
-	Uuid         string    `mapstructure:"uuid"`
-	UserName     string    `mapstructure:"user_name"`
-	UserPassword string    `mapstructure:"user_password"`
-	Members      []*Member `json:"members"`
+var accountMap = make(map[string]*Account)
+
+type Account struct {
+	Name            string
+	Uuid            string    `mapstructure:"uuid"`
+	AccountName     string    `mapstructure:"account_name"`
+	AccountPassword string    `mapstructure:"account_password"`
+	Members         []*Member `json:"members"`
+	accountHelper
+}
+
+type accountHelper struct {
+	cookieMap map[string]*http.Cookie
 }
 
 type Member struct {
@@ -35,51 +42,55 @@ type Member struct {
 	Type int    `json:"type"`
 }
 
-var userMap = make(map[string]*User)
-
 func init() {
-	for _, user := range conf.Conf.Users {
-		u := &User{}
-		err := mapstructure.Decode(user, u)
+	for _, account := range conf.Conf.Accounts {
+		u := &Account{}
+		err := mapstructure.Decode(account, u)
 		if err != nil {
 			logger.Error("mapstructure.Decode err", err)
 		} else {
-			if _, ok := userMap[u.Uuid]; ok {
-				logger.Errorf("user %s already exist", u.Uuid)
+			if _, ok := accountMap[u.Uuid]; ok {
+				logger.Errorf("account %s already exist", u.Uuid)
 			} else {
-				userMap[u.Uuid] = u
+				accountMap[u.Uuid] = u
 			}
 		}
 	}
-	logger.Info("users---", awsutil.Prettify(userMap))
+	logger.Info("accounts---", awsutil.Prettify(accountMap))
 }
 
-func GetUser(uuid string) (*User, error) {
-	user, ok := userMap[uuid]
+func GetAccount(uuid string) (*Account, error) {
+	acc, ok := accountMap[uuid]
 	if !ok {
-		return nil, fmt.Errorf("user uuid: %s is empty", uuid)
+		return nil, fmt.Errorf("account uuid: %s is empty", uuid)
 	}
-	return user, nil
+	acc.cookieMap = make(map[string]*http.Cookie)
+	return acc, nil
 }
 
-func (u *User) Login(ctx context.Context) error {
+func (u *Account) Login(ctx context.Context) error {
 	uamtk, err := u.login(ctx)
 	if err != nil {
-		return errors.Errorf(err, "user login err")
+		return errors.Errorf(err, "account login err")
 	}
-	tk, err := UAMtk(ctx, uamtk)
+	tk, err := u.uamtk(ctx, uamtk)
 	if err != nil {
 		return errors.Errorf(err, "UAMtk err")
 	}
-	err = UAMAuthClient(ctx, tk)
+	err = u.uamAuthClient(ctx, tk)
 	if err != nil {
 		return errors.Errorf(err, "UAMAuthClient err")
 	}
 	return nil
 }
 
-func (u *User) login(ctx context.Context) (string, error) {
-	logger.Infof("login user: %s", u.Uuid)
+type loginResponse struct {
+	ResultCode    int    `json:"result_code"`
+	ResultMessage string `json:"result_message"`
+	UaMTK         string `json:"uamtk"`
+}
+
+func (u *Account) login(ctx context.Context) (string, error) {
 	retryTimes := 0
 retry:
 	if retryTimes > maxRetryTime {
@@ -91,61 +102,54 @@ retry:
 		"rand":       []string{"sjrand"},
 		"_":          []string{strconv.FormatFloat(rand.Float64(), 'f', -1, 64)},
 	}
-	answer, err := code.GetAuthCode(ctx, vals)
+	answer, err := code.GetAuthCode(ctx, vals, u.cookieMap)
 	if err != nil {
 		logger.Errorf("GetAuthCode %d err: %+v", retryTimes, err)
 		retryTimes++
 		goto retry
 	}
-	ret := struct {
-		ResultCode    int    `json:"result_code"`
-		ResultMessage string `json:"result_message"`
-		UaMTK         string `json:"uamtk"`
-	}{}
+
 	v := url.Values{
-		"username": []string{u.UserName},
-		"password": []string{u.UserPassword},
+		"username": []string{u.AccountName},
+		"password": []string{u.AccountPassword},
 		"appid":    []string{"otn"},
 		"answer":   []string{answer},
 	}
 	rs := rest.NewHttp().SetContentType(rest.ContentTypeForm)
-	cookie, ok := ctx.Value("cookie").(map[string]*http.Cookie)
-	if ok {
-		rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-			cookie[helper.Cookie_PassportCt],
-			cookie[helper.Cookie_PassportSession],
-		}))
-	}
-	rs.SetHeader(map[string]interface{}{
-		helper.Header_USER_AGENT: helper.UserAgentChrome,
-	})
+	rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
+		u.cookieMap[helper.Cookie_PassportCt],
+		u.cookieMap[helper.Cookie_PassportSession],
+	}))
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
 		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
 		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
-	b, err := rs.DoRest(http.MethodPost, conf.API_BASE_LOGIN_URL, v.Encode()).ParseJsonBody(&ret)
+	rs.SetHeader(map[string]interface{}{
+		helper.Header_USER_AGENT: helper.UserAgentChrome,
+	})
+	ret := loginResponse{}
+	b, err := rs.DoRest(http.MethodPost, helper.API_BASE_LOGIN_URL, v.Encode()).ParseJsonBody(&ret)
 	if err != nil {
 		return "", errors.Errorf(err, "")
 	}
 	if ret.ResultCode != 0 {
 		return "", errors.Errorf(nil, "login fail: %+s", string(b))
 	}
-	logger.Infof("login user: %s success", u.Uuid)
 	return ret.UaMTK, nil
 }
 
-type UAMtkResponse struct {
+type uamtkResponse struct {
 	Apptk         interface{} `json:"apptk"`
 	ResultMessage string      `json:"result_message"`
 	ResultCode    int         `json:"result_code"`
 	Newapptk      string      `json:"newapptk"`
 }
 
-func UAMtk(ctx context.Context, uamtk string) (string, error) {
+func (u *Account) uamtk(ctx context.Context, uamtk string) (string, error) {
 	rs := rest.NewHttp().SetContentType(rest.ContentTypeForm)
 	rs.SetHeader(map[string]interface{}{
-		"Referer":                "https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin",
-		"Origin":                 "https://kyfw.12306.cn",
+		"Referer":                helper.BASE_URL_OF_12306 + "/otn/passport?redirect=/otn/login/userLogin",
+		"Origin":                 helper.BASE_URL_OF_12306,
 		helper.Header_USER_AGENT: helper.UserAgentChrome,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
@@ -153,34 +157,32 @@ func UAMtk(ctx context.Context, uamtk string) (string, error) {
 		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
 		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
-	ck, ok := ctx.Value("cookie").(map[string]*http.Cookie)
-	if ok {
-		rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-			ck[helper.Cookie_PassportCt],
-			ck[helper.Cookie_PassportSession],
-		}))
-	}
-	ret := UAMtkResponse{}
+	rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
+		u.cookieMap[helper.Cookie_PassportCt],
+		u.cookieMap[helper.Cookie_PassportSession],
+	}))
+
+	ret := uamtkResponse{}
 	vals := url.Values{
 		"appid": []string{"otn"},
 	}
-	_, err := rs.DoRest(http.MethodPost, conf.API_AUTH_UAMTK_URL, vals.Encode()).ParseJsonBody(&ret)
+	_, err := rs.DoRest(http.MethodPost, helper.API_AUTH_UAMTK_URL, vals.Encode()).ParseJsonBody(&ret)
 	if err != nil {
 		return "", err
 	}
-	ck[helper.Cookie_Uamtk] = rs.RespCookies()[helper.Cookie_Uamtk]
+	u.cookieMap[helper.Cookie_Uamtk] = rs.RespCookies()[helper.Cookie_Uamtk]
 	return ret.Newapptk, nil
 }
 
-type UAMAuthClientResponse struct {
+type uamAuthClientResponse struct {
 	ResultCode    int    `json:"result_code"`
 	ResultMessage string `json:"result_message"`
 	Username      string `json:"username"`
 	Apptk         string `json:"apptk"`
 }
 
-func UAMAuthClient(ctx context.Context, tk string) error {
-	ret := UAMAuthClientResponse{}
+func (u *Account) uamAuthClient(ctx context.Context, tk string) error {
+	ret := uamAuthClientResponse{}
 	rs := rest.NewHttp().SetContentType(rest.ContentTypeForm)
 	rs.SetHeader(map[string]interface{}{
 		"Referer":                "https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin",
@@ -189,18 +191,14 @@ func UAMAuthClient(ctx context.Context, tk string) error {
 	})
 	vals := make(url.Values)
 	vals.Set("tk", tk)
-
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
 		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
 		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
-	_, err := rs.DoRest(http.MethodPost, conf.API_AUTH_UAMAUTHCLIENT_URL, vals.Encode()).ParseJsonBody(&ret)
+	_, err := rs.DoRest(http.MethodPost, helper.API_AUTH_UAMAUTHCLIENT_URL, vals.Encode()).ParseJsonBody(&ret)
 	if err != nil {
 		return err
 	}
-	ck, ok := ctx.Value("cookie").(map[string]*http.Cookie)
-	if ok {
-		ck[helper.Cookie_Apptk] = rs.RespCookies()[helper.Cookie_Apptk]
-	}
+	u.cookieMap[helper.Cookie_Apptk] = rs.RespCookies()[helper.Cookie_Apptk]
 	return nil
 }

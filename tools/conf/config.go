@@ -15,7 +15,7 @@ var Conf *config
 
 type config struct {
 	Jobs           []map[string]interface{} `mapstructure:"jobs"`
-	Users          []map[string]interface{} `mapstructure:"users"`
+	Accounts       []map[string]interface{} `mapstructure:"accounts"`
 	RailDevice     string                   `mapstructure:"rail_device"`
 	RailExpire     string                   `mapstructure:"rail_expire"`
 	LoginHeartBeat int                      `mapstructure:"login_heart_beat"`

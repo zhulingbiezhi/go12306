@@ -48,7 +48,7 @@ func BuildOrderQueue(ctx context.Context, secret, seat string, trainNo string) O
 func (q *OrderQueue) Submit(ctx context.Context) error {
 	vals := "secretList=" + q.Secret + "#" + q.Seat + "|"
 	//resp := ChechFaceResponse{}
-	body, err := q.RestClient.Do(http.MethodPost, conf.API_SUBMIT_QUEUE_TICKET_URL, vals)
+	body, err := q.RestClient.Do(http.MethodPost, helper.API_SUBMIT_QUEUE_TICKET_URL, vals)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (q *OrderQueue) ChechFace(ctx context.Context) error {
 		"Referer": "https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc",
 		"Origin":  "https://kyfw.12306.cn",
 	})
-	body, err := rs.DoRest(http.MethodPost, conf.API_CHECH_QUEUE_TICKET_URL, vals).ParseJsonBody(&resp)
+	body, err := rs.DoRest(http.MethodPost, helper.API_CHECH_QUEUE_TICKET_URL, vals).ParseJsonBody(&resp)
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func (q *OrderQueue) GetSuccessRate(ctx context.Context) (bool, error) {
 	vals := "successSecret=" + q.Secret + "#" + q.Seat + "|"
 
 	//resp := ChechFaceResponse{}
-	body, err := q.RestClient.Do(http.MethodPost, conf.API_QUEUE_SUCCESS_RATE_URL, vals)
+	body, err := q.RestClient.Do(http.MethodPost, helper.API_QUEUE_SUCCESS_RATE_URL, vals)
 	if err != nil {
 		return false, err
 	}

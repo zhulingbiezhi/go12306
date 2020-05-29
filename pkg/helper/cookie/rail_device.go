@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zhulingbiezhi/go12306/tools/conf"
+	"github.com/zhulingbiezhi/go12306/pkg/helper"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
 	"github.com/zhulingbiezhi/go12306/tools/rest"
@@ -59,7 +59,7 @@ func getRailDevice(ctx context.Context) (string, error) {
 	res := struct {
 		ID string `json:"id"`
 	}{}
-	_, err := rest.NewHttp().DoRest(http.MethodGet, conf.API_GET_BROWSER_DEVICE_ID_URL, nil).ParseJsonBody(&res)
+	_, err := rest.NewHttp().DoRest(http.MethodGet, helper.API_GET_BROWSER_DEVICE_ID_URL, nil).ParseJsonBody(&res)
 	if err != nil {
 		return "", err
 	}

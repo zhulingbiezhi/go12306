@@ -55,6 +55,9 @@ func RestMultiCookiesOption(ck []*http.Cookie) RestOption {
 func RestCookieKVOption(kv map[string]interface{}) RestOption {
 	return func(r *RestHttp) {
 		for key, value := range kv {
+			if value == nil {
+				continue
+			}
 			r.cookies = append(r.cookies, &http.Cookie{
 				Name:  key,
 				Value: fmt.Sprint(value),

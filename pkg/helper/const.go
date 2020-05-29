@@ -1,26 +1,16 @@
-package conf
+package helper
 
-var (
-	HOST_URL_OF_12306 = "kyfw.12306.cn"
-	BASE_URL_OF_12306 = "https://" + HOST_URL_OF_12306
-
-	LEFT_TICKETS_URL = BASE_URL_OF_12306 + "/otn"
-
-	API_BASE_LOGIN_URL = BASE_URL_OF_12306 + "/passport/web/login"
-
-	API_USER_LOGIN_CHECK = BASE_URL_OF_12306 + "/otn/login/conf"
-
-	API_AUTH_CODE_DOWNLOAD_URL = BASE_URL_OF_12306 + "/passport/captcha/captcha-image"
-
-	API_AUTH_CODE_BASE64_DOWNLOAD = BASE_URL_OF_12306 + "/passport/captcha/captcha-image64"
-	API_AUTH_CODE_CHECK_URL       = BASE_URL_OF_12306 + "/passport/captcha/captcha-check"
-
-	API_AUTH_UAMTK_URL = BASE_URL_OF_12306 + "/passport/web/auth/uamtk"
-
-	API_AUTH_UAMAUTHCLIENT_URL = BASE_URL_OF_12306 + "/otn/uamauthclient"
-
-	API_USER_INFO_URL = BASE_URL_OF_12306 + "/otn/modifyUser/initQueryUserInfoApi"
-
+const (
+	BASE_URL_OF_12306                = "https://kyfw.12306.cn"
+	LEFT_TICKETS_URL                 = BASE_URL_OF_12306 + "/otn"
+	API_BASE_LOGIN_URL               = BASE_URL_OF_12306 + "/passport/web/login"
+	API_USER_LOGIN_CHECK             = BASE_URL_OF_12306 + "/otn/login/conf"
+	API_AUTH_CODE_DOWNLOAD_URL       = BASE_URL_OF_12306 + "/passport/captcha/captcha-image"
+	API_AUTH_CODE_BASE64_DOWNLOAD    = BASE_URL_OF_12306 + "/passport/captcha/captcha-image64"
+	API_AUTH_CODE_CHECK_URL          = BASE_URL_OF_12306 + "/passport/captcha/captcha-check"
+	API_AUTH_UAMTK_URL               = BASE_URL_OF_12306 + "/passport/web/auth/uamtk"
+	API_AUTH_UAMAUTHCLIENT_URL       = BASE_URL_OF_12306 + "/otn/uamauthclient"
+	API_USER_INFO_URL                = BASE_URL_OF_12306 + "/otn/modifyUser/initQueryUserInfoApi"
 	API_USER_PASSENGERS_URL          = BASE_URL_OF_12306 + "/otn/confirmPassenger/getPassengerDTOs"
 	API_SUBMIT_ORDER_REQUEST_URL     = BASE_URL_OF_12306 + "/otn/leftTicket/submitOrderRequest"
 	API_CHECK_ORDER_INFO_URL         = BASE_URL_OF_12306 + "/otn/confirmPassenger/checkOrderInfo"
@@ -32,13 +22,10 @@ var (
 	API_CHECH_QUEUE_TICKET_URL       = BASE_URL_OF_12306 + "/otn/afterNate/chechFace"          //候补验证
 	API_SUBMIT_QUEUE_TICKET_URL      = BASE_URL_OF_12306 + "/otn/afterNate/submitOrderRequest" //候补提交
 	API_QUEUE_SUCCESS_RATE_URL       = BASE_URL_OF_12306 + "/otn/afterNate/getSuccessRate"     //候补成功率查询
-
 	//API_GET_BROWSER_DEVICE_ID_URL    = BASE_URL_OF_12306 + "/otn/HttpZF/logdevice"
-	API_GET_BROWSER_DEVICE_ID_URL = "https://12306-rail-id-v2.pjialin.com"
-	API_FREE_CODE_QCR_API_URL     = "http://127.0.0.1:8009/check"
-
+	API_GET_BROWSER_DEVICE_ID_URL              = "https://12306-rail-id-v2.pjialin.com"
+	API_FREE_CODE_QCR_API_URL                  = "http://127.0.0.1:8009/check"
 	API_NOTIFICATION_BY_VOICE_CODE_URL         = "http://ali-voice.showapi.com/sendVoice?"
 	API_NOTIFICATION_BY_VOICE_CODE_DINGXIN_URL = "http://yuyin2.market.alicloudapi.com/dx/voice_notice"
-
-	API_CHECK_CDN_AVAILABLE = "https://%s/otn/dynamicJs/omseuuq"
+	API_CHECK_CDN_AVAILABLE                    = "https://%s/otn/dynamicJs/omseuuq"
 )

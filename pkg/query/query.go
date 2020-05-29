@@ -16,13 +16,13 @@ import (
 
 func GetQueryApiUrl() (string, error) {
 	rs := rest.NewHttp()
-	body, err := rs.Do(http.MethodGet, conf.API_QUERY_INIT_PAGE_URL, nil)
+	body, err := rs.Do(http.MethodGet, helper.API_QUERY_INIT_PAGE_URL, nil)
 	if err != nil {
 		return "", err
 	}
 	re := regexp.MustCompile("var CLeftTicketUrl = '(.*)';")
 	match := re.FindStringSubmatch(string(body))
-	return conf.LEFT_TICKETS_URL + "/" + match[1], nil
+	return helper.LEFT_TICKETS_URL + "/" + match[1], nil
 }
 
 type QueryLeftTicketRequest struct {

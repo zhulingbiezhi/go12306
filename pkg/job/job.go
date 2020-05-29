@@ -10,10 +10,10 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
 	"github.com/twinj/uuid"
+	"github.com/zhulingbiezhi/go12306/pkg/account"
 	"github.com/zhulingbiezhi/go12306/pkg/helper"
 	"github.com/zhulingbiezhi/go12306/pkg/order"
 	"github.com/zhulingbiezhi/go12306/pkg/query"
-	"github.com/zhulingbiezhi/go12306/pkg/user"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
@@ -74,9 +74,9 @@ func (job *UserJob) Run(ctx context.Context) error {
 }
 
 func (job *UserJob) Login(ctx context.Context) error {
-	u, err := user.GetUser(job.Account)
+	u, err := account.GetAccount(job.Account)
 	if err != nil {
-		return errors.Errorf(err, "GetUser err")
+		return errors.Errorf(err, "GetAccount err")
 	}
 	return u.Login(ctx)
 }
