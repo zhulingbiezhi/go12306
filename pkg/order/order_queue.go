@@ -93,8 +93,8 @@ func (q *OrderQueue) ChechFace(ctx context.Context) error {
 	resp := ChechFaceResponse{}
 	rs := q.RestClient
 	rs.SetHeader(map[string]interface{}{
-		"Referer": "https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc",
-		"Origin":  "https://kyfw.12306.cn",
+		"Referer": common.BASE_URL_OF_12306 + "/otn/leftTicket/init?linktypeid=dc",
+		"Origin":  common.BASE_URL_OF_12306,
 	})
 	body, err := rs.DoRest(http.MethodPost, common.API_CHECH_QUEUE_TICKET_URL, vals).ParseJsonBody(&resp)
 	if err != nil {

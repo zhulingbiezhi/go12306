@@ -29,11 +29,8 @@ type Account struct {
 	AccountName     string    `mapstructure:"account_name"`
 	AccountPassword string    `mapstructure:"account_password"`
 	Members         []*Member `json:"members"`
-	accountHelper
-}
-
-type accountHelper struct {
 	cookieMap map[string]*http.Cookie
+
 }
 
 type Member struct {
@@ -184,8 +181,8 @@ func (u *Account) uamAuthClient(ctx context.Context, tk string) error {
 	ret := uamAuthClientResponse{}
 	rs := rest.NewHttp().SetContentType(rest.ContentTypeForm)
 	rs.SetHeader(map[string]interface{}{
-		"Referer":                "https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin",
-		"Origin":                 "https://kyfw.12306.cn",
+		"Referer":                common.BASE_URL_OF_12306 + "/otn/passport?redirect=/otn/login/userLogin",
+		"Origin":                 common.BASE_URL_OF_12306,
 		common.Header_USER_AGENT: common.UserAgentChrome,
 	})
 	vals := make(url.Values)
