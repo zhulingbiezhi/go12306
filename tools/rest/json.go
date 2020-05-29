@@ -3,7 +3,8 @@ package rest
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+
+	"github.com/zhulingbiezhi/go12306/tools/errors"
 )
 
 func MarshalAPIJSON(code, message string, success bool,
@@ -18,7 +19,7 @@ func MarshalAPIJSON(code, message string, success bool,
 	enc := json.NewEncoder(buf)
 
 	if err := enc.Encode(x); err != nil {
-		return nil, fmt.Errorf("[MarshalJSON] Marshal失败! err:%s", err.Error())
+		return nil, errors.Errorf(err, "[MarshalJSON] Marshal失败! err:%s", err.Error())
 	}
 	return buf.Bytes(), nil
 }
