@@ -4,12 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"github.com/zhulingbiezhi/go12306/common"
-	"github.com/zhulingbiezhi/go12306/helpers/conf"
-	"github.com/zhulingbiezhi/go12306/helpers/errors"
-	"github.com/zhulingbiezhi/go12306/helpers/logger"
-	"github.com/zhulingbiezhi/go12306/helpers/rest"
-	"github.com/zhulingbiezhi/go12306/utils"
 	"image"
 	"image/jpeg"
 	"math"
@@ -19,6 +13,13 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/tools/conf"
+	"github.com/zhulingbiezhi/go12306/tools/errors"
+	"github.com/zhulingbiezhi/go12306/tools/logger"
+	"github.com/zhulingbiezhi/go12306/tools/rest"
+	"github.com/zhulingbiezhi/go12306/tools/utils"
 )
 
 type CodeResponse struct {

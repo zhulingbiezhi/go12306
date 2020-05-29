@@ -3,14 +3,15 @@ package query
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/zhulingbiezhi/go12306/common"
-	"github.com/zhulingbiezhi/go12306/helpers/conf"
-	"github.com/zhulingbiezhi/go12306/helpers/errors"
-	"github.com/zhulingbiezhi/go12306/helpers/rest"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/tools/conf"
+	"github.com/zhulingbiezhi/go12306/tools/errors"
+	"github.com/zhulingbiezhi/go12306/tools/rest"
 )
 
 func GetQueryApiUrl() (string, error) {

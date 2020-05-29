@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/zhulingbiezhi/go12306/common"
-	"github.com/zhulingbiezhi/go12306/helpers/conf"
-	"github.com/zhulingbiezhi/go12306/helpers/errors"
-	"github.com/zhulingbiezhi/go12306/helpers/logger"
-	"github.com/zhulingbiezhi/go12306/helpers/rest"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/tools/conf"
+	"github.com/zhulingbiezhi/go12306/tools/errors"
+	"github.com/zhulingbiezhi/go12306/tools/logger"
+	"github.com/zhulingbiezhi/go12306/tools/rest"
 )
 
 func GetRailDevice(ctx context.Context) error {

@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"github.com/zhulingbiezhi/go12306/helpers/errors"
-	"github.com/zhulingbiezhi/go12306/helpers/logger"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/zhulingbiezhi/go12306/tools/errors"
+	"github.com/zhulingbiezhi/go12306/tools/logger"
 )
 
 type RestHttp struct {

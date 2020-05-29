@@ -3,8 +3,9 @@ package errors
 import (
 	"errors"
 	"fmt"
-	"github.com/zhulingbiezhi/go12306/helpers/logger"
 	"runtime"
+
+	"github.com/zhulingbiezhi/go12306/tools/logger"
 )
 
 func Errorf(err error, format string, v ...interface{}) error {

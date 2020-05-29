@@ -7,11 +7,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/patrickmn/go-cache"
 	"runtime"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/patrickmn/go-cache"
 )
 
 var glsStorage *cache.Cache

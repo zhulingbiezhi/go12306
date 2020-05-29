@@ -7,8 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/spf13/viper"
 	"github.com/zhulingbiezhi/go12306/common"
-	"github.com/zhulingbiezhi/go12306/helpers/logger"
-	"github.com/zhulingbiezhi/go12306/utils"
+	"github.com/zhulingbiezhi/go12306/tools/logger"
+	"github.com/zhulingbiezhi/go12306/tools/utils"
 )
 
 var Conf *config

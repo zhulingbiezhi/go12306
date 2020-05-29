@@ -3,9 +3,10 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/asaskevich/govalidator"
 	"github.com/zhulingbiezhi/go12306/common"
-	"github.com/zhulingbiezhi/go12306/helpers/logger"
+	"github.com/zhulingbiezhi/go12306/tools/logger"
 
 	"io/ioutil"
 	"net/http"

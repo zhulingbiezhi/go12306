@@ -2,10 +2,11 @@ package order
 
 import (
 	"context"
-	"github.com/zhulingbiezhi/go12306/common"
-	"github.com/zhulingbiezhi/go12306/helpers/conf"
-	"github.com/zhulingbiezhi/go12306/helpers/rest"
 	"net/http"
+
+	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/tools/conf"
+	"github.com/zhulingbiezhi/go12306/tools/rest"
 )
 
 type Order interface {

@@ -1,8 +1,9 @@
 package query
 
 import (
-	"github.com/zhulingbiezhi/go12306/common"
 	"testing"
+
+	"github.com/zhulingbiezhi/go12306/common"
 )
 
 func TestQueryLeftTicket11(t *testing.T) {

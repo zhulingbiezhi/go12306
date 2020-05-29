@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws/awsutil"
-	log "github.com/sirupsen/logrus"
-	"github.com/zhulingbiezhi/go12306/helpers/gls"
 	"os"
 	"runtime"
 	"strings"
+
+	"github.com/aws/aws-sdk-go/aws/awsutil"
+	log "github.com/sirupsen/logrus"
+	"github.com/zhulingbiezhi/go12306/tools/gls"
 )
 
 const (

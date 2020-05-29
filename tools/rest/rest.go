@@ -2,8 +2,9 @@ package rest
 
 import (
 	"fmt"
-	"github.com/zhulingbiezhi/go12306/helpers/logger"
 	"net/http"
+
+	"github.com/zhulingbiezhi/go12306/tools/logger"
 )
 
 const (

@@ -2,20 +2,21 @@ package job
 
 import (
 	"context"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
 	"github.com/twinj/uuid"
 	"github.com/zhulingbiezhi/go12306/common"
-	"github.com/zhulingbiezhi/go12306/helpers/conf"
-	"github.com/zhulingbiezhi/go12306/helpers/errors"
-	"github.com/zhulingbiezhi/go12306/helpers/logger"
-	"github.com/zhulingbiezhi/go12306/order"
-	"github.com/zhulingbiezhi/go12306/query"
-	"github.com/zhulingbiezhi/go12306/user"
-	"net/http"
-	"strconv"
-	"time"
+	"github.com/zhulingbiezhi/go12306/pkg/order"
+	"github.com/zhulingbiezhi/go12306/pkg/query"
+	"github.com/zhulingbiezhi/go12306/pkg/user"
+	"github.com/zhulingbiezhi/go12306/tools/conf"
+	"github.com/zhulingbiezhi/go12306/tools/errors"
+	"github.com/zhulingbiezhi/go12306/tools/logger"
 )
 
 var Jobs []*UserJob
