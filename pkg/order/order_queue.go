@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/pkg/helper"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
@@ -25,17 +25,17 @@ func BuildOrderQueue(ctx context.Context, secret, seat string, trainNo string) O
 		LogHeader: false,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
 	cookie, ok := ctx.Value("cookie").(map[string]*http.Cookie)
 	if ok {
 		rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-			cookie[common.Cookie_Apptk],
+			cookie[helper.Cookie_Apptk],
 		}))
 	}
 	rs.SetHeader(map[string]interface{}{
-		common.Header_USER_AGENT: common.UserAgentChrome,
+		helper.Header_USER_AGENT: helper.UserAgentChrome,
 	})
 	return &OrderQueue{
 		RestClient: rs,

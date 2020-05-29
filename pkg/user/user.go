@@ -10,8 +10,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/mitchellh/mapstructure"
-	"github.com/zhulingbiezhi/go12306/common"
-	"github.com/zhulingbiezhi/go12306/common/code"
+	"github.com/zhulingbiezhi/go12306/pkg/helper"
+	"github.com/zhulingbiezhi/go12306/pkg/helper/code"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
@@ -112,16 +112,16 @@ retry:
 	cookie, ok := ctx.Value("cookie").(map[string]*http.Cookie)
 	if ok {
 		rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-			cookie[common.Cookie_PassportCt],
-			cookie[common.Cookie_PassportSession],
+			cookie[helper.Cookie_PassportCt],
+			cookie[helper.Cookie_PassportSession],
 		}))
 	}
 	rs.SetHeader(map[string]interface{}{
-		common.Header_USER_AGENT: common.UserAgentChrome,
+		helper.Header_USER_AGENT: helper.UserAgentChrome,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
 	b, err := rs.DoRest(http.MethodPost, conf.API_BASE_LOGIN_URL, v.Encode()).ParseJsonBody(&ret)
 	if err != nil {
@@ -146,18 +146,18 @@ func UAMtk(ctx context.Context, uamtk string) (string, error) {
 	rs.SetHeader(map[string]interface{}{
 		"Referer":                "https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin",
 		"Origin":                 "https://kyfw.12306.cn",
-		common.Header_USER_AGENT: common.UserAgentChrome,
+		helper.Header_USER_AGENT: helper.UserAgentChrome,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		common.Cookie_Uamtk:           uamtk,
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		helper.Cookie_Uamtk:           uamtk,
+		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
 	ck, ok := ctx.Value("cookie").(map[string]*http.Cookie)
 	if ok {
 		rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-			ck[common.Cookie_PassportCt],
-			ck[common.Cookie_PassportSession],
+			ck[helper.Cookie_PassportCt],
+			ck[helper.Cookie_PassportSession],
 		}))
 	}
 	ret := UAMtkResponse{}
@@ -168,7 +168,7 @@ func UAMtk(ctx context.Context, uamtk string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	ck[common.Cookie_Uamtk] = rs.RespCookies()[common.Cookie_Uamtk]
+	ck[helper.Cookie_Uamtk] = rs.RespCookies()[helper.Cookie_Uamtk]
 	return ret.Newapptk, nil
 }
 
@@ -185,14 +185,14 @@ func UAMAuthClient(ctx context.Context, tk string) error {
 	rs.SetHeader(map[string]interface{}{
 		"Referer":                "https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin",
 		"Origin":                 "https://kyfw.12306.cn",
-		common.Header_USER_AGENT: common.UserAgentChrome,
+		helper.Header_USER_AGENT: helper.UserAgentChrome,
 	})
 	vals := make(url.Values)
 	vals.Set("tk", tk)
 
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
 	_, err := rs.DoRest(http.MethodPost, conf.API_AUTH_UAMAUTHCLIENT_URL, vals.Encode()).ParseJsonBody(&ret)
 	if err != nil {
@@ -200,7 +200,7 @@ func UAMAuthClient(ctx context.Context, tk string) error {
 	}
 	ck, ok := ctx.Value("cookie").(map[string]*http.Cookie)
 	if ok {
-		ck[common.Cookie_Apptk] = rs.RespCookies()[common.Cookie_Apptk]
+		ck[helper.Cookie_Apptk] = rs.RespCookies()[helper.Cookie_Apptk]
 	}
 	return nil
 }

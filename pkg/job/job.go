@@ -10,7 +10,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
 	"github.com/twinj/uuid"
-	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/pkg/helper"
 	"github.com/zhulingbiezhi/go12306/pkg/order"
 	"github.com/zhulingbiezhi/go12306/pkg/query"
 	"github.com/zhulingbiezhi/go12306/pkg/user"
@@ -110,10 +110,10 @@ func (job *UserJob) Query(ctx context.Context, queueChan chan<- order.Order) err
 
 func (job *UserJob) QueryLeftTicketRequest(date string) *query.QueryLeftTicketRequest {
 	return &query.QueryLeftTicketRequest{
-		FromStation: common.StationMap[job.Station.Left].Key,
-		ToStation:   common.StationMap[job.Station.Arrive].Key,
+		FromStation: helper.StationMap[job.Station.Left].Key,
+		ToStation:   helper.StationMap[job.Station.Arrive].Key,
 		TrainDate:   date,
-		PurposeCode: common.PurposeTypeAdult,
+		PurposeCode: helper.PurposeTypeAdult,
 	}
 }
 
@@ -121,13 +121,13 @@ func (job *UserJob) FilterResult(ctx context.Context, result *query.TicketResult
 	orders := make([]order.Order, 0)
 	queues := make([]order.Order, 0)
 	for _, seat := range job.Seats {
-		seatKey := common.SeatType[seat]
+		seatKey := helper.SeatType[seat]
 		seatValue := ""
 		switch seat {
 		case "高级软卧":
 			seatValue = result.SeniorSoftSleeper
 		case "软卧", "一等卧":
-			seatKey = common.SeatType["软卧"]
+			seatKey = helper.SeatType["软卧"]
 			seatValue = result.SoftSleeper
 		case "软座":
 			seatValue = result.SoftSeat

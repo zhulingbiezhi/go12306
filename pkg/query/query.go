@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/pkg/helper"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/rest"
@@ -29,7 +29,7 @@ type QueryLeftTicketRequest struct {
 	FromStation string
 	ToStation   string
 	TrainDate   string
-	PurposeCode common.PurposeType
+	PurposeCode helper.PurposeType
 }
 
 type QueryLeftTicketResponse struct {
@@ -91,17 +91,17 @@ func QueryLeftTicket(request *QueryLeftTicketRequest) ([]*TicketResult, error) {
 		return nil, errors.Errorf(err, "GetQueryApiUrl err")
 	}
 	vals := url.Values{}
-	vals.Set(common.Query_TrainDate, request.TrainDate)
-	vals.Set(common.Query_FromStation, request.FromStation)
-	vals.Set(common.Query_ToStation, request.ToStation)
-	vals.Set(common.Query_PurposeCodes, request.PurposeCode.String())
+	vals.Set(helper.Query_TrainDate, request.TrainDate)
+	vals.Set(helper.Query_FromStation, request.FromStation)
+	vals.Set(helper.Query_ToStation, request.ToStation)
+	vals.Set(helper.Query_PurposeCodes, request.PurposeCode.String())
 	rs := rest.NewHttp()
 	rs.SetHeader(map[string]interface{}{
-		common.Header_USER_AGENT: common.UserAgentChrome,
+		helper.Header_USER_AGENT: helper.UserAgentChrome,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
 	//特定排序
 	subUrlFormat := "leftTicketDTO.train_date=%s&leftTicketDTO.from_station=%s&leftTicketDTO.to_station=%s&purpose_codes=%s"

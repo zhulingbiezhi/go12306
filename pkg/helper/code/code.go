@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/pkg/helper"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
@@ -46,7 +46,7 @@ func GetAuthCode(ctx context.Context, vals url.Values) (string, error) {
 		if ok {
 			for key, ck := range rs.RespCookies() {
 				switch key {
-				case common.Cookie_PassportCt, common.Cookie_PassportSession:
+				case helper.Cookie_PassportCt, helper.Cookie_PassportSession:
 					cookie[ck.Name] = rs.RespCookies()[key]
 				}
 			}
@@ -133,8 +133,8 @@ func CheckAuthCode(ctx context.Context, answer string) (bool, error) {
 	cookie, ok := ctx.Value("cookie").(map[string]*http.Cookie)
 	if ok {
 		rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-			cookie[common.Cookie_PassportSession],
-			cookie[common.Cookie_PassportCt],
+			cookie[helper.Cookie_PassportSession],
+			cookie[helper.Cookie_PassportCt],
 		}))
 	}
 	_, err := rs.DoRest(http.MethodGet, urlStr, nil).ParseJsonBody(&ret)

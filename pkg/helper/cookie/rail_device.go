@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zhulingbiezhi/go12306/common"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
@@ -44,12 +43,12 @@ retry:
 	}
 	cookie, ok := ctx.Value("cookie").(map[string]*http.Cookie)
 	if ok {
-		cookie[common.Cookie_RAIL_DEVICEID] = &http.Cookie{
-			Name:  common.Cookie_RAIL_DEVICEID,
+		cookie[helper.Cookie_RAIL_DEVICEID] = &http.Cookie{
+			Name:  helper.Cookie_RAIL_DEVICEID,
 			Value: ret.Dfp,
 		}
-		cookie[common.Cookie_RAIL_EXPIRATION] = &http.Cookie{
-			Name:  common.Cookie_RAIL_EXPIRATION,
+		cookie[helper.Cookie_RAIL_EXPIRATION] = &http.Cookie{
+			Name:  helper.Cookie_RAIL_EXPIRATION,
 			Value: ret.Exp,
 		}
 	}

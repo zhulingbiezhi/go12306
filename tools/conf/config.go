@@ -6,7 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/spf13/viper"
-	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/pkg/helper"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
 	"github.com/zhulingbiezhi/go12306/tools/utils"
 )
@@ -35,7 +35,7 @@ func init() {
 	for _, value := range result {
 		infos := strings.Split(value, "|")
 		if len(infos) == 6 {
-			common.StationMap[infos[1]] = &common.StationInfo{
+			helper.StationMap[infos[1]] = &helper.StationInfo{
 				ID:       infos[5],
 				Name:     infos[1],
 				Key:      infos[2],

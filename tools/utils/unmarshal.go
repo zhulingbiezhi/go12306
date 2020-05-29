@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/pkg/helper"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
 
 	"io/ioutil"
@@ -35,12 +35,12 @@ func ParseBodyAndUnmarshal(r *http.Request, req interface{}) error {
 	if er = json.Unmarshal(postData, req); er != nil {
 		return fmt.Errorf(" json解码失败. err:%s, body:%s", er, string(postData))
 	}
-	if parse, ok := req.(common.ParseRequest); ok {
+	if parse, ok := req.(helper.ParseRequest); ok {
 		if err := parse.ParseRequest(r); err != nil {
 			return fmt.Errorf("ParseRequest err: %s", err.Error())
 		}
 	}
-	if valid, ok := req.(common.ValidRequest); ok {
+	if valid, ok := req.(helper.ValidRequest); ok {
 		if er := valid.ValidParam(); er != nil {
 			return fmt.Errorf(" 参数错误. err:%s, body:%s", er, string(postData))
 		}
