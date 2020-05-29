@@ -2,7 +2,6 @@ package account
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -62,7 +61,7 @@ func init() {
 func GetAccount(uuid string) (*Account, error) {
 	acc, ok := accountMap[uuid]
 	if !ok {
-		return nil, fmt.Errorf("account uuid: %s is empty", uuid)
+		return nil, errors.Errorf(nil, "account uuid: %s is empty", uuid)
 	}
 	acc.cookieMap = make(map[string]*http.Cookie)
 	return acc, nil

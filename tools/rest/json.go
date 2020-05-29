@@ -6,9 +6,9 @@ import (
 	"fmt"
 )
 
-func MarshalChatJSON(code, message string, success bool,
+func MarshalAPIJSON(code, message string, success bool,
 	xStruct interface{}) ([]byte, error) {
-	x := &ChatAPIJSONFormat{}
+	x := &APIJSONFormat{}
 	x.GError.Code = code
 	x.GError.Message = message
 	x.Success = success
@@ -23,7 +23,7 @@ func MarshalChatJSON(code, message string, success bool,
 	return buf.Bytes(), nil
 }
 
-type ChatAPIJSONFormat struct {
+type APIJSONFormat struct {
 	GError  `json:"error,omitempty"`
 	XStruct interface{} `json:"result"  structs:"result"`
 	Success bool        `json:"success"  structs:"success"`
@@ -37,10 +37,10 @@ type GError struct {
 
 //GetSuccessJSON 执行成功，返回的处理
 func GetSuccessJSON(xStruct interface{}) ([]byte, error) {
-	return MarshalChatJSON("", "", true, xStruct)
+	return MarshalAPIJSON("", "", true, xStruct)
 }
 
 //GetFailedJSON 将错误信息依指定格式序列化
 func GetFailedJSON(code, message string) ([]byte, error) {
-	return MarshalChatJSON(code, message, false, struct{}{})
+	return MarshalAPIJSON(code, message, false, struct{}{})
 }
