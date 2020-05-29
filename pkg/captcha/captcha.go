@@ -1,4 +1,4 @@
-package code
+package captcha
 
 import (
 	"context"
@@ -14,19 +14,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zhulingbiezhi/go12306/pkg/helper"
+	"github.com/zhulingbiezhi/go12306/pkg/common"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
 	"github.com/zhulingbiezhi/go12306/tools/rest"
 	"github.com/zhulingbiezhi/go12306/tools/utils"
 )
 
-type Code struct {
+type Captcha struct {
 	CookieMap map[string]*http.Cookie
-}
-
-type Request struct {
-	Vals url.Values
 }
 
 type imageResponse struct {
@@ -39,7 +35,7 @@ func GetAuthCode(ctx context.Context, vals url.Values, cookieMap map[string]*htt
 	if len(vals) == 0 {
 		return "", errors.Errorf(nil, "data is empty")
 	}
-	c := Code{
+	c := Captcha{
 		CookieMap: cookieMap,
 	}
 	resp, err := c.generatorCodeImage(ctx, vals)
@@ -69,8 +65,8 @@ func GetAuthCode(ctx context.Context, vals url.Values, cookieMap map[string]*htt
 	return answer, nil
 }
 
-func (c *Code) generatorCodeImage(ctx context.Context, vals url.Values) (*imageResponse, error) {
-	urlStr := helper.API_AUTH_CODE_BASE64_DOWNLOAD + "?" + vals.Encode()
+func (c *Captcha) generatorCodeImage(ctx context.Context, vals url.Values) (*imageResponse, error) {
+	urlStr := common.API_AUTH_CODE_BASE64_DOWNLOAD + "?" + vals.Encode()
 	code := &imageResponse{}
 	rs := rest.NewHttp()
 	_, err := rs.DoRest(http.MethodGet, urlStr, nil).ParseJsonBody(code)
@@ -80,7 +76,7 @@ func (c *Code) generatorCodeImage(ctx context.Context, vals url.Values) (*imageR
 
 	for key, ck := range rs.RespCookies() {
 		switch key {
-		case helper.Cookie_PassportCt, helper.Cookie_PassportSession:
+		case common.Cookie_PassportCt, common.Cookie_PassportSession:
 			c.CookieMap[ck.Name] = rs.RespCookies()[key]
 		}
 	}
@@ -99,7 +95,7 @@ func getVerifyCode(img string) ([]int, error) {
 		Result []int  `json:"result"`
 	}{}
 	rs := rest.NewHttp().SetContentType(rest.ContentTypeForm)
-	_, err := rs.DoRest(http.MethodPost, helper.API_FREE_CODE_QCR_API_URL, vals.Encode()).ParseJsonBody(&ret)
+	_, err := rs.DoRest(http.MethodPost, common.API_FREE_CODE_QCR_API_URL, vals.Encode()).ParseJsonBody(&ret)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +105,7 @@ func getVerifyCode(img string) ([]int, error) {
 	return ret.Result, nil
 }
 
-func (c *Code) checkAuthCode(ctx context.Context, answer string) (bool, error) {
+func (c *Captcha) checkAuthCode(ctx context.Context, answer string) (bool, error) {
 	vals := url.Values{
 		"login_site": []string{"E"},
 		"module":     []string{"login"},
@@ -117,15 +113,15 @@ func (c *Code) checkAuthCode(ctx context.Context, answer string) (bool, error) {
 		"_":          []string{strconv.FormatFloat(rand.Float64(), 'f', -1, 64)},
 		"answer":     []string{answer},
 	}
-	urlStr := helper.API_AUTH_CODE_CHECK_URL + "?" + vals.Encode()
+	urlStr := common.API_AUTH_CODE_CHECK_URL + "?" + vals.Encode()
 	ret := struct {
 		ResultMessage string `json:"result_message"`
 		ResultCode    string `json:"result_code"`
 	}{}
 	rs := rest.NewHttp().SetContentType(rest.ContentTypeForm)
 	rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-		c.CookieMap[helper.Cookie_PassportSession],
-		c.CookieMap[helper.Cookie_PassportCt],
+		c.CookieMap[common.Cookie_PassportSession],
+		c.CookieMap[common.Cookie_PassportCt],
 	}))
 	_, err := rs.DoRest(http.MethodGet, urlStr, nil).ParseJsonBody(&ret)
 	if err != nil {

@@ -10,8 +10,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/mitchellh/mapstructure"
-	"github.com/zhulingbiezhi/go12306/pkg/helper"
-	"github.com/zhulingbiezhi/go12306/pkg/helper/code"
+	"github.com/zhulingbiezhi/go12306/pkg/captcha"
+	"github.com/zhulingbiezhi/go12306/pkg/common"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
@@ -102,7 +102,7 @@ retry:
 		"rand":       []string{"sjrand"},
 		"_":          []string{strconv.FormatFloat(rand.Float64(), 'f', -1, 64)},
 	}
-	answer, err := code.GetAuthCode(ctx, vals, u.cookieMap)
+	answer, err := captcha.GetAuthCode(ctx, vals, u.cookieMap)
 	if err != nil {
 		logger.Errorf("GetAuthCode %d err: %+v", retryTimes, err)
 		retryTimes++
@@ -117,18 +117,18 @@ retry:
 	}
 	rs := rest.NewHttp().SetContentType(rest.ContentTypeForm)
 	rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-		u.cookieMap[helper.Cookie_PassportCt],
-		u.cookieMap[helper.Cookie_PassportSession],
+		u.cookieMap[common.Cookie_PassportCt],
+		u.cookieMap[common.Cookie_PassportSession],
 	}))
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
 	rs.SetHeader(map[string]interface{}{
-		helper.Header_USER_AGENT: helper.UserAgentChrome,
+		common.Header_USER_AGENT: common.UserAgentChrome,
 	})
 	ret := loginResponse{}
-	b, err := rs.DoRest(http.MethodPost, helper.API_BASE_LOGIN_URL, v.Encode()).ParseJsonBody(&ret)
+	b, err := rs.DoRest(http.MethodPost, common.API_BASE_LOGIN_URL, v.Encode()).ParseJsonBody(&ret)
 	if err != nil {
 		return "", errors.Errorf(err, "")
 	}
@@ -148,29 +148,29 @@ type uamtkResponse struct {
 func (u *Account) uamtk(ctx context.Context, uamtk string) (string, error) {
 	rs := rest.NewHttp().SetContentType(rest.ContentTypeForm)
 	rs.SetHeader(map[string]interface{}{
-		"Referer":                helper.BASE_URL_OF_12306 + "/otn/passport?redirect=/otn/login/userLogin",
-		"Origin":                 helper.BASE_URL_OF_12306,
-		helper.Header_USER_AGENT: helper.UserAgentChrome,
+		"Referer":                common.BASE_URL_OF_12306 + "/otn/passport?redirect=/otn/login/userLogin",
+		"Origin":                 common.BASE_URL_OF_12306,
+		common.Header_USER_AGENT: common.UserAgentChrome,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		helper.Cookie_Uamtk:           uamtk,
-		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_Uamtk:           uamtk,
+		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
 	rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-		u.cookieMap[helper.Cookie_PassportCt],
-		u.cookieMap[helper.Cookie_PassportSession],
+		u.cookieMap[common.Cookie_PassportCt],
+		u.cookieMap[common.Cookie_PassportSession],
 	}))
 
 	ret := uamtkResponse{}
 	vals := url.Values{
 		"appid": []string{"otn"},
 	}
-	_, err := rs.DoRest(http.MethodPost, helper.API_AUTH_UAMTK_URL, vals.Encode()).ParseJsonBody(&ret)
+	_, err := rs.DoRest(http.MethodPost, common.API_AUTH_UAMTK_URL, vals.Encode()).ParseJsonBody(&ret)
 	if err != nil {
 		return "", err
 	}
-	u.cookieMap[helper.Cookie_Uamtk] = rs.RespCookies()[helper.Cookie_Uamtk]
+	u.cookieMap[common.Cookie_Uamtk] = rs.RespCookies()[common.Cookie_Uamtk]
 	return ret.Newapptk, nil
 }
 
@@ -187,18 +187,18 @@ func (u *Account) uamAuthClient(ctx context.Context, tk string) error {
 	rs.SetHeader(map[string]interface{}{
 		"Referer":                "https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin",
 		"Origin":                 "https://kyfw.12306.cn",
-		helper.Header_USER_AGENT: helper.UserAgentChrome,
+		common.Header_USER_AGENT: common.UserAgentChrome,
 	})
 	vals := make(url.Values)
 	vals.Set("tk", tk)
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
-	_, err := rs.DoRest(http.MethodPost, helper.API_AUTH_UAMAUTHCLIENT_URL, vals.Encode()).ParseJsonBody(&ret)
+	_, err := rs.DoRest(http.MethodPost, common.API_AUTH_UAMAUTHCLIENT_URL, vals.Encode()).ParseJsonBody(&ret)
 	if err != nil {
 		return err
 	}
-	u.cookieMap[helper.Cookie_Apptk] = rs.RespCookies()[helper.Cookie_Apptk]
+	u.cookieMap[common.Cookie_Apptk] = rs.RespCookies()[common.Cookie_Apptk]
 	return nil
 }

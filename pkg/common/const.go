@@ -1,5 +1,19 @@
-package helper
+package common
 
+//header、cookie相关
+const (
+	Header_USER_AGENT      = "User-Agent"
+	Cookie_RAIL_DEVICEID   = "RAIL_DEVICEID"
+	Cookie_RAIL_EXPIRATION = "RAIL_EXPIRATION"
+	Cookie_PassportSession = "_passport_session"
+	Cookie_PassportCt      = "_passport_ct"
+	Cookie_Uamtk           = "uamtk"
+	Cookie_Apptk           = "tk"
+
+	UserAgentChrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36"
+)
+
+//url
 const (
 	BASE_URL_OF_12306                = "https://kyfw.12306.cn"
 	LEFT_TICKETS_URL                 = BASE_URL_OF_12306 + "/otn"

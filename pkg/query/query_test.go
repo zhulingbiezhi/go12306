@@ -3,7 +3,7 @@ package query
 import (
 	"testing"
 
-	"github.com/zhulingbiezhi/go12306/pkg/helper"
+	"github.com/zhulingbiezhi/go12306/pkg/common"
 )
 
 func TestQueryLeftTicket11(t *testing.T) {
@@ -19,10 +19,10 @@ func TestQueryLeftTicket11(t *testing.T) {
 			name: "test query",
 			args: args{
 				request: &QueryLeftTicketRequest{
-					FromStation: helper.StationMap["深圳"].Key,
-					ToStation:   helper.StationMap["吉安"].Key,
+					FromStation: common.StationMap["深圳"].Key,
+					ToStation:   common.StationMap["吉安"].Key,
 					TrainDate:   "2020-01-22",
-					PurposeCode: helper.PurposeTypeAdult,
+					PurposeCode: common.PurposeTypeAdult,
 				},
 			},
 			wantErr: false,

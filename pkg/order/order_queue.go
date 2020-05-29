@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/zhulingbiezhi/go12306/pkg/helper"
+	"github.com/zhulingbiezhi/go12306/pkg/common"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
@@ -25,17 +25,17 @@ func BuildOrderQueue(ctx context.Context, secret, seat string, trainNo string) O
 		LogHeader: false,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
 	cookie, ok := ctx.Value("cookie").(map[string]*http.Cookie)
 	if ok {
 		rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
-			cookie[helper.Cookie_Apptk],
+			cookie[common.Cookie_Apptk],
 		}))
 	}
 	rs.SetHeader(map[string]interface{}{
-		helper.Header_USER_AGENT: helper.UserAgentChrome,
+		common.Header_USER_AGENT: common.UserAgentChrome,
 	})
 	return &OrderQueue{
 		RestClient: rs,
@@ -48,7 +48,7 @@ func BuildOrderQueue(ctx context.Context, secret, seat string, trainNo string) O
 func (q *OrderQueue) Submit(ctx context.Context) error {
 	vals := "secretList=" + q.Secret + "#" + q.Seat + "|"
 	//resp := ChechFaceResponse{}
-	body, err := q.RestClient.Do(http.MethodPost, helper.API_SUBMIT_QUEUE_TICKET_URL, vals)
+	body, err := q.RestClient.Do(http.MethodPost, common.API_SUBMIT_QUEUE_TICKET_URL, vals)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (q *OrderQueue) ChechFace(ctx context.Context) error {
 		"Referer": "https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc",
 		"Origin":  "https://kyfw.12306.cn",
 	})
-	body, err := rs.DoRest(http.MethodPost, helper.API_CHECH_QUEUE_TICKET_URL, vals).ParseJsonBody(&resp)
+	body, err := rs.DoRest(http.MethodPost, common.API_CHECH_QUEUE_TICKET_URL, vals).ParseJsonBody(&resp)
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func (q *OrderQueue) GetSuccessRate(ctx context.Context) (bool, error) {
 	vals := "successSecret=" + q.Secret + "#" + q.Seat + "|"
 
 	//resp := ChechFaceResponse{}
-	body, err := q.RestClient.Do(http.MethodPost, helper.API_QUEUE_SUCCESS_RATE_URL, vals)
+	body, err := q.RestClient.Do(http.MethodPost, common.API_QUEUE_SUCCESS_RATE_URL, vals)
 	if err != nil {
 		return false, err
 	}

@@ -8,7 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/zhulingbiezhi/go12306/pkg/helper"
+	"github.com/zhulingbiezhi/go12306/pkg/common"
+	"github.com/zhulingbiezhi/go12306/pkg/train"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/rest"
@@ -16,20 +17,20 @@ import (
 
 func GetQueryApiUrl() (string, error) {
 	rs := rest.NewHttp()
-	body, err := rs.Do(http.MethodGet, helper.API_QUERY_INIT_PAGE_URL, nil)
+	body, err := rs.Do(http.MethodGet, common.API_QUERY_INIT_PAGE_URL, nil)
 	if err != nil {
 		return "", err
 	}
 	re := regexp.MustCompile("var CLeftTicketUrl = '(.*)';")
 	match := re.FindStringSubmatch(string(body))
-	return helper.LEFT_TICKETS_URL + "/" + match[1], nil
+	return common.LEFT_TICKETS_URL + "/" + match[1], nil
 }
 
 type QueryLeftTicketRequest struct {
 	FromStation string
 	ToStation   string
 	TrainDate   string
-	PurposeCode helper.PurposeType
+	PurposeCode train.PurposeType
 }
 
 type QueryLeftTicketResponse struct {
@@ -91,17 +92,17 @@ func QueryLeftTicket(request *QueryLeftTicketRequest) ([]*TicketResult, error) {
 		return nil, errors.Errorf(err, "GetQueryApiUrl err")
 	}
 	vals := url.Values{}
-	vals.Set(helper.Query_TrainDate, request.TrainDate)
-	vals.Set(helper.Query_FromStation, request.FromStation)
-	vals.Set(helper.Query_ToStation, request.ToStation)
-	vals.Set(helper.Query_PurposeCodes, request.PurposeCode.String())
+	vals.Set(train.Query_TrainDate, request.TrainDate)
+	vals.Set(train.Query_FromStation, request.FromStation)
+	vals.Set(train.Query_ToStation, request.ToStation)
+	vals.Set(train.Query_PurposeCodes, request.PurposeCode.String())
 	rs := rest.NewHttp()
 	rs.SetHeader(map[string]interface{}{
-		helper.Header_USER_AGENT: helper.UserAgentChrome,
+		common.Header_USER_AGENT: common.UserAgentChrome,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		helper.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		helper.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
 	}))
 	//特定排序
 	subUrlFormat := "leftTicketDTO.train_date=%s&leftTicketDTO.from_station=%s&leftTicketDTO.to_station=%s&purpose_codes=%s"

@@ -11,9 +11,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/twinj/uuid"
 	"github.com/zhulingbiezhi/go12306/pkg/account"
-	"github.com/zhulingbiezhi/go12306/pkg/helper"
 	"github.com/zhulingbiezhi/go12306/pkg/order"
 	"github.com/zhulingbiezhi/go12306/pkg/query"
+	"github.com/zhulingbiezhi/go12306/pkg/train"
 	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
@@ -110,10 +110,10 @@ func (job *UserJob) Query(ctx context.Context, queueChan chan<- order.Order) err
 
 func (job *UserJob) QueryLeftTicketRequest(date string) *query.QueryLeftTicketRequest {
 	return &query.QueryLeftTicketRequest{
-		FromStation: helper.StationMap[job.Station.Left].Key,
-		ToStation:   helper.StationMap[job.Station.Arrive].Key,
+		FromStation: train.StationMap[job.Station.Left].Key,
+		ToStation:   train.StationMap[job.Station.Arrive].Key,
 		TrainDate:   date,
-		PurposeCode: helper.PurposeTypeAdult,
+		PurposeCode: train.PurposeTypeAdult,
 	}
 }
 
@@ -121,13 +121,13 @@ func (job *UserJob) FilterResult(ctx context.Context, result *query.TicketResult
 	orders := make([]order.Order, 0)
 	queues := make([]order.Order, 0)
 	for _, seat := range job.Seats {
-		seatKey := helper.SeatType[seat]
+		seatKey := train.SeatType[seat]
 		seatValue := ""
 		switch seat {
 		case "高级软卧":
 			seatValue = result.SeniorSoftSleeper
 		case "软卧", "一等卧":
-			seatKey = helper.SeatType["软卧"]
+			seatKey = train.SeatType["软卧"]
 			seatValue = result.SoftSleeper
 		case "软座":
 			seatValue = result.SoftSeat

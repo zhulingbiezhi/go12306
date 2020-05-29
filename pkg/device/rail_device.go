@@ -1,4 +1,4 @@
-package cookie
+package device
 
 import (
 	"context"
@@ -8,13 +8,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zhulingbiezhi/go12306/pkg/helper"
+	"github.com/zhulingbiezhi/go12306/pkg/common"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
 	"github.com/zhulingbiezhi/go12306/tools/rest"
 )
 
-func GetRailDevice(ctx context.Context) error {
+func GetRailDevice(ctx context.Context, cookieMap map[string]*http.Cookie) error {
 	retryTimes := 0
 retry:
 	retryTimes++
@@ -32,6 +32,7 @@ retry:
 		time.Sleep(time.Millisecond * 200)
 		goto retry
 	}
+	//get device
 	ret := struct {
 		Exp string `json:"exp"`
 		Dfp string `json:"dfp"`
@@ -41,16 +42,13 @@ retry:
 	if err != nil {
 		return errors.Errorf(err, "json.Unmarshal err")
 	}
-	cookie, ok := ctx.Value("cookie").(map[string]*http.Cookie)
-	if ok {
-		cookie[helper.Cookie_RAIL_DEVICEID] = &http.Cookie{
-			Name:  helper.Cookie_RAIL_DEVICEID,
-			Value: ret.Dfp,
-		}
-		cookie[helper.Cookie_RAIL_EXPIRATION] = &http.Cookie{
-			Name:  helper.Cookie_RAIL_EXPIRATION,
-			Value: ret.Exp,
-		}
+	cookieMap[common.Cookie_RAIL_DEVICEID] = &http.Cookie{
+		Name:  common.Cookie_RAIL_DEVICEID,
+		Value: ret.Dfp,
+	}
+	cookieMap[common.Cookie_RAIL_EXPIRATION] = &http.Cookie{
+		Name:  common.Cookie_RAIL_EXPIRATION,
+		Value: ret.Exp,
 	}
 	return nil
 }
@@ -59,7 +57,7 @@ func getRailDevice(ctx context.Context) (string, error) {
 	res := struct {
 		ID string `json:"id"`
 	}{}
-	_, err := rest.NewHttp().DoRest(http.MethodGet, helper.API_GET_BROWSER_DEVICE_ID_URL, nil).ParseJsonBody(&res)
+	_, err := rest.NewHttp().DoRest(http.MethodGet, common.API_GET_BROWSER_DEVICE_ID_URL, nil).ParseJsonBody(&res)
 	if err != nil {
 		return "", err
 	}
