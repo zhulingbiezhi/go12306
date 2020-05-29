@@ -2,7 +2,7 @@ package rest
 
 import (
 	"fmt"
-	"go12306/helpers/logger"
+	"github.com/zhulingbiezhi/go12306/helpers/logger"
 	"net/http"
 )
 

@@ -2,11 +2,11 @@ package logger
 
 import (
 	"bytes"
-	"chat/utils/gls"
 	"errors"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	log "github.com/sirupsen/logrus"
+	"github.com/zhulingbiezhi/go12306/helpers/gls"
 	"os"
 	"runtime"
 	"strings"

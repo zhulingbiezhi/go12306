@@ -2,9 +2,8 @@ package main
 
 import (
 	"context"
-	"go12306/helpers/logger"
-	"go12306/job"
-	_ "go12306/job"
+	"github.com/zhulingbiezhi/go12306/helpers/logger"
+	"github.com/zhulingbiezhi/go12306/job"
 )
 
 func main() {

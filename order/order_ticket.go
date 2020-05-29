@@ -2,9 +2,9 @@ package order
 
 import (
 	"context"
-	"go12306/common"
-	"go12306/helpers/conf"
-	"go12306/helpers/rest"
+	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/helpers/conf"
+	"github.com/zhulingbiezhi/go12306/helpers/rest"
 	"net/http"
 )
 

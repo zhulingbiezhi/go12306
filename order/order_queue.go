@@ -3,11 +3,11 @@ package order
 import (
 	"context"
 	"fmt"
-	"go12306/common"
-	"go12306/helpers/conf"
-	"go12306/helpers/errors"
-	"go12306/helpers/logger"
-	"go12306/helpers/rest"
+	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/helpers/conf"
+	"github.com/zhulingbiezhi/go12306/helpers/errors"
+	"github.com/zhulingbiezhi/go12306/helpers/logger"
+	"github.com/zhulingbiezhi/go12306/helpers/rest"
 	"net/http"
 )
 

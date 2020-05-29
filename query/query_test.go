@@ -1,7 +1,7 @@
 package query
 
 import (
-	"go12306/common"
+	"github.com/zhulingbiezhi/go12306/common"
 	"testing"
 )
 

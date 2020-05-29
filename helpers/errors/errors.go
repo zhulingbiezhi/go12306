@@ -3,7 +3,7 @@ package errors
 import (
 	"errors"
 	"fmt"
-	"go12306/helpers/logger"
+	"github.com/zhulingbiezhi/go12306/helpers/logger"
 	"runtime"
 )
 

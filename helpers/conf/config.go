@@ -1,10 +1,14 @@
 package conf
 
 import (
+	"io/ioutil"
+	"strings"
+
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/spf13/viper"
-	"go12306/helpers/logger"
-	"go12306/utils"
+	"github.com/zhulingbiezhi/go12306/common"
+	"github.com/zhulingbiezhi/go12306/helpers/logger"
+	"github.com/zhulingbiezhi/go12306/utils"
 )
 
 var Conf *config
@@ -22,6 +26,22 @@ func init() {
 	Conf, err = LoadConf()
 	if err != nil {
 		panic(err)
+	}
+	b, err := ioutil.ReadFile(utils.GetCurDir() + "/config/stations.txt")
+	if err != nil {
+		panic(err)
+	}
+	result := strings.Split(string(b), "@")
+	for _, value := range result {
+		infos := strings.Split(value, "|")
+		if len(infos) == 6 {
+			common.StationMap[infos[1]] = &common.StationInfo{
+				ID:       infos[5],
+				Name:     infos[1],
+				Key:      infos[2],
+				Spelling: infos[3],
+			}
+		}
 	}
 }
 

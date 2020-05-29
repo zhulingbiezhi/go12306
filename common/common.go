@@ -1,9 +1,7 @@
 package common
 
 import (
-	"go12306/utils"
-	"io/ioutil"
-	"strings"
+	"net/http"
 )
 
 var (
@@ -65,21 +63,10 @@ type StationInfo struct {
 
 var StationMap = make(map[string]*StationInfo)
 
-func init() {
-	b, err := ioutil.ReadFile(utils.GetCurDir() + "/config/stations.txt")
-	if err != nil {
-		panic(err)
-	}
-	result := strings.Split(string(b), "@")
-	for _, value := range result {
-		infos := strings.Split(value, "|")
-		if len(infos) == 6 {
-			StationMap[infos[1]] = &StationInfo{
-				ID:       infos[5],
-				Name:     infos[1],
-				Key:      infos[2],
-				Spelling: infos[3],
-			}
-		}
-	}
+type ValidRequest interface {
+	ValidParam() error
+}
+
+type ParseRequest interface {
+	ParseRequest(r *http.Request) error
 }
