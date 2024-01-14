@@ -3,7 +3,6 @@ module github.com/zhulingbiezhi/go12306
 go 1.13
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535
 	github.com/aws/aws-sdk-go v1.31.7
 	github.com/mitchellh/mapstructure v1.3.1
 	github.com/myesui/uuid v1.0.0 // indirect

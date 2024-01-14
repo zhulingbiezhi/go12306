@@ -1,5 +1,5 @@
 accounts:
-  - acount_name: ''
+  - account_name: ''
     account_password: ''
     uuid: 'test'
 rail_device: ''  #需要12306网站cookie中的RAIL_RAIL_DEVICEID
@@ -32,5 +32,5 @@ jobs:
     except_train_numbers:  #优先排除某些车次
       - 'K1620'
     query_interval: 3 #查询的间隔
-    queue_ticke_flag: true #是否抢候补
+    queue_ticket_flag: true #是否抢候补
 

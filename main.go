@@ -1,18 +1,29 @@
 package main
 
 import (
-	"context"
-
+	"github.com/zhulingbiezhi/go12306/config"
+	"github.com/zhulingbiezhi/go12306/pkg/account"
 	"github.com/zhulingbiezhi/go12306/pkg/job"
-	"github.com/zhulingbiezhi/go12306/tools/logger"
 )
 
 func main() {
-	for _, job := range job.Jobs {
-		err := job.Run(context.Background())
-		if err != nil {
-			logger.Error(err)
-		}
+	cfg, err := config.LoadConf()
+	if err != nil {
+		panic(err)
+	}
+	jobMgr := &job.JobMgr{}
+	userMgr := &account.AccountMgr{}
+	err = userMgr.Init(cfg.Accounts)
+	if err != nil {
+		panic(err)
+	}
+	err = jobMgr.Init(userMgr, cfg.Jobs)
+	if err != nil {
+		panic(err)
+	}
+	err = jobMgr.Run()
+	if err != nil {
+		panic(err)
 	}
 	select {}
 }

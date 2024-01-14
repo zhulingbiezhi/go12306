@@ -30,18 +30,18 @@ type APIJSONFormat struct {
 	Success bool        `json:"success"  structs:"success"`
 }
 
-//GError 错误信息，succes为true时，值都为空
+// GError 错误信息，succes为true时，值都为空
 type GError struct {
 	Code    string `json:"code"  structs:"code"`
 	Message string `json:"message"  structs:"message"`
 }
 
-//GetSuccessJSON 执行成功，返回的处理
+// GetSuccessJSON 执行成功，返回的处理
 func GetSuccessJSON(xStruct interface{}) ([]byte, error) {
 	return MarshalAPIJSON("", "", true, xStruct)
 }
 
-//GetFailedJSON 将错误信息依指定格式序列化
+// GetFailedJSON 将错误信息依指定格式序列化
 func GetFailedJSON(code, message string) ([]byte, error) {
 	return MarshalAPIJSON(code, message, false, struct{}{})
 }

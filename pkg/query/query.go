@@ -8,9 +8,9 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/zhulingbiezhi/go12306/config"
 	"github.com/zhulingbiezhi/go12306/pkg/common"
 	"github.com/zhulingbiezhi/go12306/pkg/train"
-	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/rest"
 )
@@ -101,8 +101,8 @@ func QueryLeftTicket(request *QueryLeftTicketRequest) ([]*TicketResult, error) {
 		common.Header_USER_AGENT: common.UserAgentChrome,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_RAIL_EXPIRATION: config.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   config.Conf.RailDevice,
 	}))
 	//特定排序
 	subUrlFormat := "leftTicketDTO.train_date=%s&leftTicketDTO.from_station=%s&leftTicketDTO.to_station=%s&purpose_codes=%s"

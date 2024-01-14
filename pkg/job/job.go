@@ -6,79 +6,46 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
 	"github.com/twinj/uuid"
+	"github.com/zhulingbiezhi/go12306/config"
 	"github.com/zhulingbiezhi/go12306/pkg/account"
 	"github.com/zhulingbiezhi/go12306/pkg/order"
 	"github.com/zhulingbiezhi/go12306/pkg/query"
 	"github.com/zhulingbiezhi/go12306/pkg/train"
-	"github.com/zhulingbiezhi/go12306/tools/conf"
-	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
 )
 
-var Jobs []*UserJob
-
 type UserJob struct {
-	Name               string   `mapstructure:"name"`
-	Account            string   `mapstructure:"account"`
-	Seats              []string `mapstructure:"seats"`
-	ExceptTrainNumbers []string `mapstructure:"except_train_numbers"`
-	TrainNumbers       []string `mapstructure:"train_numbers"`
-	Dates              []string `mapstructure:"dates"`
-	Station            *Station `mapstructure:"station"`
-	Members            []string `mapstructure:"members"`
-	QueryInterval      int      `mapstructure:"query_interval"`
-	AllowLessMember    bool     `mapstructure:"allow_less_member"`
-}
-
-type Station struct {
-	Left   string `mapstructure:"left"`
-	Arrive string `mapstructure:"arrive"`
-}
-
-func init() {
-	jobs := make([]*UserJob, 0)
-	for _, jb := range conf.Conf.Jobs {
-		job := &UserJob{}
-		err := mapstructure.Decode(jb, job)
-		if err != nil {
-			logger.Error("mapstructure.Decode err", err)
-		} else {
-			jobs = append(jobs, job)
-		}
-	}
-	logger.Info(awsutil.Prettify(jobs))
-	Jobs = jobs
+	Name               string
+	Account            *account.AccountHelper
+	Seats              []string
+	ExceptTrainNumbers []string
+	TrainNumbers       []string
+	Dates              []string
+	Station            *config.Station
+	Members            []string
+	QueryInterval      int
+	AllowLessMember    bool
 }
 
 func (job *UserJob) Run(ctx context.Context) error {
 	stopChan := make(chan struct{}, 1)
-	loginChan := make(chan struct{}, 1)
-	loginSuccessChan := make(chan bool, 1)
 	orderChan := make(chan order.Order, 50)
 
 	ctx = context.WithValue(ctx, "cookie", map[string]*http.Cookie{})
 
-	//login heart beat
-	go job.LoginJob(ctx, loginChan, loginSuccessChan, stopChan)
 	//wait for first login
-	WaitForLogin(loginChan, loginSuccessChan)
+	wait, err := job.Account.Login(ctx)
+	if err != nil {
+		return err
+	}
+	<-wait
 	//query
 	go job.TicketQueryJob(ctx, orderChan, stopChan)
 	//order
 	go job.TicketOrderOrQueue(ctx, orderChan, stopChan)
 	return nil
-}
-
-func (job *UserJob) Login(ctx context.Context) error {
-	u, err := account.GetAccount(job.Account)
-	if err != nil {
-		return errors.Errorf(err, "GetAccount err")
-	}
-	return u.Login(ctx)
 }
 
 func (job *UserJob) Query(ctx context.Context, queueChan chan<- order.Order) error {
@@ -188,19 +155,6 @@ func (job *UserJob) FilterResult(ctx context.Context, result *query.TicketResult
 	return orders
 }
 
-func WaitForLogin(loginChan chan<- struct{}, successChan chan bool) {
-	loginChan <- struct{}{}
-	for {
-		select {
-		case success := <-successChan:
-			if success {
-				return
-			}
-			loginChan <- struct{}{}
-		}
-	}
-}
-
 func (job *UserJob) TicketQueryJob(ctx context.Context, orderChan chan<- order.Order, stopChan <-chan struct{}) {
 	logger.GoroutineInit(logger.WithFields(logrus.Fields{
 		"request_id": uuid.NewV1(),
@@ -213,7 +167,6 @@ func (job *UserJob) TicketQueryJob(ctx context.Context, orderChan chan<- order.O
 		select {
 		case <-t.C:
 			logger.Infof("query timer %d", index)
-			t.Reset(sec)
 			if err := job.Query(ctx, orderChan); err != nil {
 				logger.Error("job query err", err)
 			}
@@ -221,6 +174,7 @@ func (job *UserJob) TicketQueryJob(ctx context.Context, orderChan chan<- order.O
 			t.Stop()
 			return
 		}
+		t.Reset(sec)
 	}
 }
 
@@ -240,38 +194,6 @@ func (job *UserJob) TicketOrderOrQueue(ctx context.Context, orderChan <-chan ord
 				break
 			}
 			stopChan <- struct{}{}
-			return
-		}
-	}
-}
-
-func (job *UserJob) LoginJob(ctx context.Context, loginChan <-chan struct{}, loginSuccessChan chan bool, stopChan <-chan struct{}) {
-	logger.GoroutineInit(logger.WithFields(logrus.Fields{
-		"request_id": uuid.NewV1(),
-	}))
-	sec := time.Second * time.Duration(conf.Conf.LoginHeartBeat)
-	t := time.NewTimer(sec)
-	for {
-		select {
-		case <-t.C:
-			if err := job.Login(ctx); err != nil {
-				logger.Error("job login err:", err)
-				//5秒后重试登录
-				t.Reset(time.Second * 5)
-			} else {
-				logger.Info("job login success")
-				t.Reset(time.Second * time.Duration(conf.Conf.LoginHeartBeat))
-			}
-		case <-loginChan:
-			if err := job.Login(ctx); err != nil {
-				logger.Error("loginChan---job login err:", err)
-				loginSuccessChan <- false
-			} else {
-				logger.Info("loginChan---job login success")
-				loginSuccessChan <- true
-			}
-		case <-stopChan:
-			t.Stop()
 			return
 		}
 	}

@@ -1,4 +1,5 @@
-/**
+/*
+*
 Important: this package only for log
 */
 package gls
@@ -24,8 +25,10 @@ var littleBuf = sync.Pool{
 	},
 }
 
-/**
-  from: https://github.com/golang/net/blob/master/http2/gotrack.go#L165:1
+/*
+*
+
+	from: https://github.com/golang/net/blob/master/http2/gotrack.go#L165:1
 */
 func curGoroutineID() uint64 {
 	bp := littleBuf.Get().(*[]byte)

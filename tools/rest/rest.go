@@ -16,7 +16,7 @@ const (
 	ContentTypeForm = "application/x-www-form-urlencoded; charset=UTF-8"
 )
 
-//ToFailedJSON 返回处理失败的JSON给调用方
+// ToFailedJSON 返回处理失败的JSON给调用方
 func ToFailedJSON(w http.ResponseWriter, code, message string) {
 	body, err := GetFailedJSON(code, message)
 	if err != nil {

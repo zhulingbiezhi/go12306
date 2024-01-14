@@ -8,6 +8,13 @@ import (
 	"github.com/zhulingbiezhi/go12306/tools/logger"
 )
 
+func New(msg string) error {
+	e := &MyErr{}
+	e.fileInfo = getFileName()
+	e.err = errors.New(msg)
+	return e
+}
+
 func Errorf(err error, format string, v ...interface{}) error {
 	e := &MyErr{}
 	e.fileInfo = getFileName()

@@ -7,11 +7,9 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/mitchellh/mapstructure"
+	"github.com/zhulingbiezhi/go12306/config"
 	"github.com/zhulingbiezhi/go12306/pkg/captcha"
 	"github.com/zhulingbiezhi/go12306/pkg/common"
-	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/errors"
 	"github.com/zhulingbiezhi/go12306/tools/logger"
 	"github.com/zhulingbiezhi/go12306/tools/rest"
@@ -21,47 +19,17 @@ const (
 	maxRetryTime = 5
 )
 
-var accountMap = make(map[string]*Account)
-
 type Account struct {
 	Name            string
-	Uuid            string    `mapstructure:"uuid"`
-	AccountName     string    `mapstructure:"account_name"`
-	AccountPassword string    `mapstructure:"account_password"`
-	Members         []*Member `json:"members"`
-	cookieMap map[string]*http.Cookie
-
+	AccountName     string
+	AccountPassword string
+	members         []*Member
+	cookieMap       map[string]*http.Cookie
 }
 
 type Member struct {
 	Name string `json:"name"`
 	Type int    `json:"type"`
-}
-
-func init() {
-	for _, account := range conf.Conf.Accounts {
-		u := &Account{}
-		err := mapstructure.Decode(account, u)
-		if err != nil {
-			logger.Error("mapstructure.Decode err", err)
-		} else {
-			if _, ok := accountMap[u.Uuid]; ok {
-				logger.Errorf("account %s already exist", u.Uuid)
-			} else {
-				accountMap[u.Uuid] = u
-			}
-		}
-	}
-	logger.Info("accounts---", awsutil.Prettify(accountMap))
-}
-
-func GetAccount(uuid string) (*Account, error) {
-	acc, ok := accountMap[uuid]
-	if !ok {
-		return nil, errors.Errorf(nil, "account uuid: %s is empty", uuid)
-	}
-	acc.cookieMap = make(map[string]*http.Cookie)
-	return acc, nil
 }
 
 func (u *Account) Login(ctx context.Context) error {
@@ -117,8 +85,8 @@ retry:
 		u.cookieMap[common.Cookie_PassportSession],
 	}))
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_RAIL_EXPIRATION: config.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   config.Conf.RailDevice,
 	}))
 	rs.SetHeader(map[string]interface{}{
 		common.Header_USER_AGENT: common.UserAgentChrome,
@@ -150,8 +118,8 @@ func (u *Account) uamtk(ctx context.Context, uamtk string) (string, error) {
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
 		common.Cookie_Uamtk:           uamtk,
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_RAIL_EXPIRATION: config.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   config.Conf.RailDevice,
 	}))
 	rs.SetCookie(rest.RestMultiCookiesOption([]*http.Cookie{
 		u.cookieMap[common.Cookie_PassportCt],
@@ -188,8 +156,8 @@ func (u *Account) uamAuthClient(ctx context.Context, tk string) error {
 	vals := make(url.Values)
 	vals.Set("tk", tk)
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_RAIL_EXPIRATION: config.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   config.Conf.RailDevice,
 	}))
 	_, err := rs.DoRest(http.MethodPost, common.API_AUTH_UAMAUTHCLIENT_URL, vals.Encode()).ParseJsonBody(&ret)
 	if err != nil {

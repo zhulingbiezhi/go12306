@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/zhulingbiezhi/go12306/config"
 	"github.com/zhulingbiezhi/go12306/pkg/common"
-	"github.com/zhulingbiezhi/go12306/tools/conf"
 	"github.com/zhulingbiezhi/go12306/tools/rest"
 )
 
@@ -26,8 +26,8 @@ func BuildOrderTicket(ctx context.Context, secret, seat string) Order {
 		LogHeader: false,
 	})
 	rs.SetCookie(rest.RestCookieKVOption(map[string]interface{}{
-		common.Cookie_RAIL_EXPIRATION: conf.Conf.RailExpire,
-		common.Cookie_RAIL_DEVICEID:   conf.Conf.RailDevice,
+		common.Cookie_RAIL_EXPIRATION: config.Conf.RailExpire,
+		common.Cookie_RAIL_DEVICEID:   config.Conf.RailDevice,
 	}))
 	cookie, ok := ctx.Value("cookie").(map[string]*http.Cookie)
 	if ok {

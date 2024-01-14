@@ -1,5 +1,12 @@
 package train
 
+import (
+	"os"
+	"strings"
+
+	"github.com/zhulingbiezhi/go12306/tools/utils"
+)
+
 var (
 	SeatType = map[string]string{
 		"高级动卧": "A",
@@ -46,3 +53,22 @@ type StationInfo struct {
 }
 
 var StationMap = make(map[string]*StationInfo)
+
+func init() {
+	b, err := os.ReadFile(utils.GetCurDir() + "/config/stations.txt")
+	if err != nil {
+		panic(err)
+	}
+	result := strings.Split(string(b), "@")
+	for _, value := range result {
+		infos := strings.Split(value, "|")
+		if len(infos) == 6 {
+			StationMap[infos[1]] = &StationInfo{
+				ID:       infos[5],
+				Name:     infos[1],
+				Key:      infos[2],
+				Spelling: infos[3],
+			}
+		}
+	}
+}
